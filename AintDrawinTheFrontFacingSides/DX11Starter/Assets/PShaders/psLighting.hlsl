@@ -45,7 +45,6 @@ cbuffer lights : register(b0)
 
 Texture2D Texture		: register(t0);
 Texture2D NormalMap		: register(t1);
-//TextureCube Sky			: register(t2);
 SamplerState Sampler	: register(s0);
 
 // Struct representing the data we expect to receive from earlier pipeline stages
@@ -126,7 +125,6 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	input.normal = normalize(input.normal);
 	input.tangent = normalize(input.tangent);
-	input.uv.y = 1.0f - input.uv.y;
 
 	//BELOW IS NORMAL MAPPING
 
@@ -154,8 +152,6 @@ float4 main(VertexToPixel input) : SV_TARGET
 	{
 		sumOfDiffuse += calcSpotLight(input.worldPos, input.normal, lights.spotLights[i2]);
 	}
-
-	//float4 skyColor = Sky.Sample(Sampler, reflect(-toCamera, input.normal));
 
 	float4 finalLighting = sumOfDiffuse + (lights.AmbientColor * 0.1f);
 

@@ -149,7 +149,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	for (int i = 0; i < entities.size(); i++)
 	{
-		//entities[i]->move({ 0.25f * deltaTime, 0.0f * deltaTime, 0.0f * deltaTime });
+		entities[i]->move({ 0.25f * deltaTime, 0.0f * deltaTime, 0.0f * deltaTime });
 		entities[i]->update(deltaTime);
 	}
 }
@@ -179,42 +179,36 @@ void Game::Draw(float deltaTiame, float totalTime)
 	////    and then copying that entire buffer to the GPU.  
 	////  - The "SimpleShader" class handles all of that for you.
 	
-	Entity* entity = entities[0];
-	Material* mat = entity->getMat();
-	ID3D11SamplerState* sampler = mat->getSampler();
-	ID3D11ShaderResourceView* shaderResView = mat->getShaderResView();
-	ID3D11ShaderResourceView* normalMap = mat->getNormalMap();
-	SimplePixelShader* ps = mat->getPShader();
-	mat->getVShader()->SetMatrix4x4("view", camera->getViewMatrix());
-	mat->getVShader()->SetMatrix4x4("projection", camera->getProjectionMatrix());
-	ps->SetData("lights", &lights, sizeof(Lights));
-	ps->SetSamplerState("Sampler", sampler);
-	ps->SetShaderResourceView("Texture", shaderResView);
-	ps->SetShaderResourceView("NormalMap", normalMap);
-
 	for (int i = 0; i < entities.size(); i++)
 	{
-		/*Entity* entity = entities[0];
+		Entity* entity = entities[i];
 		Material* mat = entity->getMat();
 		ID3D11SamplerState* sampler = mat->getSampler();
 		ID3D11ShaderResourceView* shaderResView = mat->getShaderResView();
 		ID3D11ShaderResourceView* normalMap = mat->getNormalMap();
 		SimplePixelShader* ps = mat->getPShader();
+
 		mat->getVShader()->SetMatrix4x4("view", camera->getViewMatrix());
 		mat->getVShader()->SetMatrix4x4("projection", camera->getProjectionMatrix());
+		//ps->SetData("spotLights", lights.spotLights, sizeof(SpotLight) * 8);
 		ps->SetData("lights", &lights, sizeof(Lights));
+		//ps->SetData("spotLight", &spotLight, sizeof(SpotLight));
+		//ps->SetData("pointLight", &pointLight, sizeof(PointLight));
+		/*ps->SetData("dirLight1", &dirLight1, sizeof(DirectionalLight));
+		ps->SetData("dirLight2", &dirLight2, sizeof(DirectionalLight));
+		ps->SetData("dirLight3", &dirLight3, sizeof(DirectionalLight));*/
 		ps->SetSamplerState("Sampler", sampler);
 		ps->SetShaderResourceView("Texture", shaderResView);
-		ps->SetShaderResourceView("NormalMap", normalMap);*/
-		entities[i]->draw();
-		/*sampler->Release();
-		shaderResView->Release();
-		normalMap->Release();*/
-	}
+		ps->SetShaderResourceView("NormalMap", normalMap);
+	
+		entity->draw();
 
-	sampler->Release();
-	shaderResView->Release();
-	normalMap->Release();
+		//did this as a nice way to use the material
+		mat->ReleaseSampler();
+		mat->ReleaseShaderResView();
+		//sampler->Release();
+		//shaderResView->Release();
+	}
 
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
@@ -244,10 +238,6 @@ void Game::Draw(float deltaTiame, float totalTime)
 
 	// Actually draw
 	context->DrawIndexed(entities[0]->getMesh()->GetIndexCount(), 0, 0);
-
-	// Reset the states!
-	context->RSSetState(0);
-	context->OMSetDepthStencilState(0, 0);
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it

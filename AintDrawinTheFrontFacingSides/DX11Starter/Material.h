@@ -16,10 +16,10 @@ public:
 
 	SimpleVertexShader* getVShader();
 	SimplePixelShader* getPShader();
+
 	ID3D11ShaderResourceView* getShaderResView();
 	ID3D11ShaderResourceView* getNormalMap();
 	ID3D11SamplerState* getSampler();
-
 	void ReleaseShaderResView();
 	void ReleaseSampler();
 
